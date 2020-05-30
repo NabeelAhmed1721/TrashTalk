@@ -2,8 +2,6 @@ package main
 
 import (
 	"context"
-	"crypto/sha1"
-	"encoding/hex"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -19,33 +17,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"gopkg.in/mgo.v2/bson"
 )
-
-// Auth middleware
-func Auth() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		session := sessions.Default(c)
-
-		if session.Get("auth") != true {
-			c.Redirect(302, "/login")
-		} else {
-			// c.Redirect(302, "/dashboard")
-			c.Next()
-		}
-	}
-}
-
-// AlrAuth middleware
-func AlrAuth() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		session := sessions.Default(c)
-
-		if session.Get("auth") == true {
-			c.Redirect(302, "/dashboard")
-		} else {
-			c.Next()
-		}
-	}
-}
 
 func stringInSlice(a string, list []string) bool {
 	for _, b := range list {
@@ -66,36 +37,6 @@ func emailExists(email string, collection *mongo.Collection) bool {
 	}
 
 	return true
-}
-
-func hasher(password string) string {
-	// Hash password
-	hasher := sha1.New()
-	hasher.Write([]byte(password))
-	passwordHashHex := hasher.Sum(nil)
-
-	passwordHash := hex.EncodeToString(passwordHashHex)
-	return passwordHash
-}
-
-// User Modal
-type User struct {
-	FName    string
-	LName    string
-	Email    string
-	Password string
-}
-
-// Post Modal
-type Post struct {
-	PostID      string // unique post id
-	AuthorEmail string // email
-	AuthorName  string
-	Date        string // date id
-	ImagePath   string // image path
-	Title       string // post title
-	Desc        string // post desc
-	Location    string // post location
 }
 
 func main() {
