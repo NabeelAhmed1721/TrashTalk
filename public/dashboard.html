@@ -1,0 +1,59 @@
+<html>
+    <head>
+        <title>
+            Dashboard
+        </title>
+        <link rel="stylesheet" href="/static/css/main.css?v=2">
+    </head>
+    <body>
+        <div id="addModal" class="modal">
+            <div onclick="modalHandler()" class="close">X</div>
+            <div class="modal-title">Give away your junk!</div>
+            <div class="modal-form">
+                <form>
+                    <input type="text" name="prodName" placeholder="Product title...">
+                    <textarea type="text" name="prodDesc" placeholder="Product description..."></textarea>
+                    <input type="text" name="prodLocation" placeholder="Location...">
+                    <div style="margin-top: 10px;">Image of Product</div>
+                    <input type="file" name="prodImage" placeholder="Location...">
+                </form>
+            </div>
+        </div>
+        <div class="header">
+            <div class="logo"><img src="/static/assets/trash_talk.png"></div>
+            <a href="/profile">
+                <div class="profile">
+                    <img class="profile-pic" src="/static/assets/defaultAvatar.png">
+                </div>
+            </a>
+        </div>
+        <div class="main">
+            <div class="card">
+                <img src="/static/assets/post.jpg">
+                <div class="card-info">
+                    <div class="card-title">Used USB</div>
+                    <div class="card-desc">Issa poorly used usb. I mean what more can I say?</div>
+                    <div class="card-desc">Princeton - NJ</div>
+                    <div class="card-author">Edward Man</div>
+                </div>
+            </div>
+        </div>
+        <div onclick="modalHandler()" class="add">+</div>
+    </body>
+    <script>
+        var _localData = {}
+        var xhttp = new XMLHttpRequest();
+        xhttp.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+            // Typical action to be performed when the document is ready:
+            _localData = JSON.parse(xhttp.responseText);
+            }
+        };
+        xhttp.open("GET", "/info", true);
+        xhttp.send();
+
+        function modalHandler() {
+            document.getElementById("addModal").classList.toggle("modalShow")
+        }
+    </script>
+</html>

@@ -1,0 +1,54 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans&display=swap');
+
+
+.modal {
+    font-family: 'Open Sans', sans-serif;
+    position: fixed;
+    width: 75%;
+    height: 75%;
+    box-shadow: 0px 5px 10px 3px rgba(0,0,0,0.08);
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.profile {
+    position: absolute;
+    width: 65%;
+    height: 100%;
+    left: 50%;
+    top: 0;
+    transform: translate(-50%);
+    text-align: center;
+}
+
+.profile-pic {
+    position: absolute;
+    left: 50%;
+    transform: translate(-50%);
+    margin-top: 20px;
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    overflow: hidden;
+}
+
+.profile-info {
+    margin-top: 130px;
+}
+
+.profile-pic img {
+    -webkit-user-select: none;
+    width: 100%;
+}
+
+.logout {
+    float: right;
+    margin-right: 20px;
+    margin-top: -25px;
+}
+
+.return {
+    margin-left: 20px;
+    margin-top: 20px;
+}

@@ -1,0 +1,26 @@
+<html>
+    <head>
+        <title>Sign up</title>
+        <link rel="stylesheet" href="/static/css/signup.css">
+    </head>
+    <body>
+        <div class="modal">
+            <div class="logo">
+                <img src="/static/assets/trash_talk.png">
+            </div>
+            <div class="title">Sign up</div>
+            <div class="form">
+                <form action="/api/signup" method="POST">
+                    <input style="width:calc(75% / 2)" required type="text" name="fname" placeholder="First Name...">
+                    <input style="width:calc(75% / 2)" required type="text" name="lname" placeholder="Last Name...">
+                    <input required type="email" name="email" placeholder="Email...">
+                    <input required type="password" name="password" placeholder="Password...">
+                    <input required type="password" name="password_r" placeholder="Repeat Password...">
+                    <input class="submit" type="submit" value="Signup">
+                </form>
+                <br>
+                <div><a href="/login">Login instead</a></div>
+            </div>
+        </div> 
+    </body>
+</html>
