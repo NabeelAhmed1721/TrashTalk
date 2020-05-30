@@ -10,12 +10,13 @@
             <div onclick="modalHandler()" class="close">X</div>
             <div class="modal-title">Give away your junk!</div>
             <div class="modal-form">
-                <form>
-                    <input type="text" name="prodName" placeholder="Product title...">
+                <form action="/api/addpost" method="POST" enctype="multipart/form-data">
+                    <input type="text" name="prodTitle" placeholder="Product title...">
                     <textarea type="text" name="prodDesc" placeholder="Product description..."></textarea>
-                    <input type="text" name="prodLocation" placeholder="Location...">
+                    <input type="text" name="prodLoc" placeholder="Location...">
                     <div style="margin-top: 10px;">Image of Product</div>
-                    <input type="file" name="prodImage" placeholder="Location...">
+                    <input type="file" name="prodImage">
+                    <input style="cursor: pointer;" type="submit" value="Post">
                 </form>
             </div>
         </div>

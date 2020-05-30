@@ -4,13 +4,17 @@ import (
 	"context"
 	"crypto/sha1"
 	"encoding/hex"
+	"encoding/json"
 	"fmt"
 	"log"
+	"path/filepath"
+	"time"
 
 	"github.com/gin-contrib/sessions"
 	"github.com/gin-contrib/sessions/cookie"
 	"github.com/gin-contrib/static"
 	"github.com/gin-gonic/gin"
+	"github.com/rs/xid"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"gopkg.in/mgo.v2/bson"
@@ -43,6 +47,15 @@ func AlrAuth() gin.HandlerFunc {
 	}
 }
 
+func stringInSlice(a string, list []string) bool {
+	for _, b := range list {
+		if b == a {
+			return true
+		}
+	}
+	return false
+}
+
 func emailExists(email string, collection *mongo.Collection) bool {
 	filter := bson.M{"email": email}
 	var result User
@@ -73,12 +86,25 @@ type User struct {
 	Password string
 }
 
+// Post Modal
+type Post struct {
+	PostID      string // unique post id
+	AuthorEmail string // email
+	AuthorName  string
+	Date        string // date id
+	ImagePath   string // image path
+	Title       string // post title
+	Desc        string // post desc
+	Location    string // post location
+}
+
 func main() {
 	gin.SetMode(gin.ReleaseMode)
 	mgdClientOpt := options.Client().ApplyURI("mongodb+srv://na-admin:rV9byQPoKeQBJpka@trashtalkpuddle-qpofb.mongodb.net/")
 	mgdClient, err := mongo.Connect(context.TODO(), mgdClientOpt)
 
 	usersCollection := mgdClient.Database("trashtalk").Collection("users")
+	postsCollection := mgdClient.Database("trashtalk").Collection("posts")
 
 	if err != nil {
 		log.Fatal(err)
@@ -209,6 +235,74 @@ func main() {
 			c.Redirect(302, "/dashboard")
 		}
 
+	})
+
+	router.GET("/posts/", Auth(), func(c *gin.Context) {
+		var final []Post
+		items, err := postsCollection.Find(context.TODO(), bson.M{})
+		if err != nil {
+			log.Fatal(err)
+		}
+		for items.Next(context.TODO()) {
+			var post Post
+			items.Decode(&post)
+			final = append(final, post)
+		}
+		data, err := json.Marshal(final)
+		if err != nil {
+			log.Fatal(err)
+		}
+		c.String(200, string(data))
+	})
+
+	router.POST("/api/addpost", Auth(), func(c *gin.Context) {
+		session := sessions.Default(c)
+
+		prodTitle, _ := c.GetPostForm("prodTitle")
+		prodDesc, _ := c.GetPostForm("prodDesc")
+		prodLoc, _ := c.GetPostForm("prodLoc")
+		prodImageFile, err := c.FormFile("prodImage")
+
+		if err != nil {
+			log.Fatal(err)
+		}
+
+		guid := xid.New()
+		uniqueID := guid.String()
+
+		imageExtension := filepath.Ext(prodImageFile.Filename)
+		if stringInSlice(imageExtension, []string{".png", ".jpg"}) {
+			err := c.SaveUploadedFile(prodImageFile, "./public/posts/"+uniqueID+imageExtension)
+			if err != nil {
+				log.Fatal(err)
+			}
+
+			postID := uniqueID
+			authorEmail := session.Get("email")
+			authorName := session.Get("name")
+			date := time.Now().Format("01-02-2006")
+			imagePath := uniqueID + imageExtension
+			title := prodTitle
+			desc := prodDesc
+			location := prodLoc
+
+			post := Post{
+				postID,
+				fmt.Sprintf("%v", authorEmail), // interface conversion
+				fmt.Sprintf("%v", authorName),  // interface conversion
+				date,
+				imagePath,
+				title,
+				desc,
+				location,
+			}
+
+			postsCollection.InsertOne(context.TODO(), post)
+
+			c.Redirect(302, "/dashboard")
+		} else {
+			c.Redirect(302, "/dashboard")
+		}
 	})
 
 	// port 3000
