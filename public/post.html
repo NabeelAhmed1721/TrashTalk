@@ -1,0 +1,85 @@
+<html>
+    <head>
+        <title>TrashTalk</title>
+        <link rel="stylesheet" href="/static/css/post.css?v=1">
+    </head>
+    <body>
+        <div class="modal">
+            <!-- br9f65mg10l50gpg8g10 -->
+            <a href="/dashboard"><div class="return">Back</div></a>
+            <form id="form" action="" method="POST"><div style="cursor: pointer;" id="deleteButton" onclick="deleteHandler()" class="delete">Delete</div></form>
+            <img id="postImage" src="">
+            <div class="info">
+                <div id="postTitle"></div>
+                <div id="postDesc"></div>
+                <div id="postDate"></div>
+                <div id="postLoc"></div>
+                <div class="contact">Contact Info: </div>
+                <div id="postAuthor"></div>
+                <div id="postEmail"></div>
+            </div>
+        </div>
+    </body>
+    <script>
+        var form = document.getElementById("form");
+        const params = new URLSearchParams(window.location.search)
+        var idparam = params.get("id")
+
+        form.setAttribute("action", "/api/delete/post/"+idparam)
+
+        var _localData = {}
+        var _postData = {}
+        var _owner = {}
+
+        var owner = new XMLHttpRequest();
+        owner.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+            // Typical action to be performed when the document is ready:
+            _owner = JSON.parse(owner.responseText);
+                if(!_owner.isClientPost) {
+                    form.remove()
+                }
+            }
+        };
+        owner.open("GET", "/api/isitmypost/"+idparam, true);
+        owner.send();
+
+        var localData = new XMLHttpRequest();
+        localData.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+            // Typical action to be performed when the document is ready:
+            _localData = JSON.parse(localData.responseText);
+            }
+        };
+        localData.open("GET", "/api/info", true);
+        localData.send();
+        
+        var postData = new XMLHttpRequest();
+        postData.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+            // Typical action to be performed when the document is ready:
+            _postData = JSON.parse(postData.responseText);
+
+
+            document.getElementById("postImage").setAttribute("src", "/static/posts/"+_postData.ImagePath)
+
+            document.getElementById("postTitle").innerText = _postData.Title
+            document.getElementById("postDesc").innerText = _postData.Desc
+            document.getElementById("postDate").innerText = "Date: "+_postData.Date
+            document.getElementById("postLoc").innerText = "Location: "+_postData.Location
+
+            document.getElementById("postAuthor").innerText = "Author: "+_postData.AuthorName
+            document.getElementById("postEmail").innerText = "Email: "+_postData.AuthorEmail
+            }
+        };
+        postData.open("GET", "/api/post/"+idparam, true);
+        postData.send();
+
+
+        function deleteHandler() {
+            document.getElementById("deleteButton").addEventListener("click", function () {
+                form.submit();
+            });
+        }
+    </script>
+</html>

@@ -77,6 +77,10 @@ func main() {
 		c.File("./public/dashboard.html")
 	})
 
+	router.GET("/post", Auth(), func(c *gin.Context) {
+		c.File("./public/post.html")
+	})
+
 	router.GET("/signup", AlrAuth(), func(c *gin.Context) {
 		c.File("./public/signup.html")
 	})
@@ -95,7 +99,7 @@ func main() {
 		c.Redirect(302, "/login")
 	})
 
-	router.GET("/info", Auth(), func(c *gin.Context) {
+	router.GET("/api/info", Auth(), func(c *gin.Context) {
 		session := sessions.Default(c)
 		if session.Get("auth") == true {
 			c.JSON(200, gin.H{
@@ -178,7 +182,7 @@ func main() {
 
 	})
 
-	router.GET("/posts/:email", Auth(), func(c *gin.Context) {
+	router.GET("/api/posts/:email", Auth(), func(c *gin.Context) {
 		requestedEmail := c.Param("email")
 		var final []Post
 		items, err := postsCollection.Find(context.TODO(), bson.M{"authoremail": requestedEmail})
@@ -197,7 +201,7 @@ func main() {
 		c.String(200, string(data))
 	})
 
-	router.GET("/posts/", Auth(), func(c *gin.Context) {
+	router.GET("/api/posts/", Auth(), func(c *gin.Context) {
 		var final []Post
 		items, err := postsCollection.Find(context.TODO(), bson.M{})
 		if err != nil {
@@ -213,6 +217,68 @@ func main() {
 			log.Fatal(err)
 		}
 		c.String(200, string(data))
+	})
+
+	router.GET("/api/isitmypost/:ID", Auth(), func(c *gin.Context) {
+		session := sessions.Default(c)
+
+		clientEmail := session.Get("email")
+
+		requestedID := c.Param("ID")
+		filter := bson.M{
+			"postid": requestedID,
+		}
+		var post Post
+
+		postsCollection.FindOne(context.TODO(), filter).Decode(&post)
+
+		if post.AuthorEmail == clientEmail {
+			c.JSON(200, bson.M{"isClientPost": true})
+		} else {
+			c.JSON(200, bson.M{"isClientPost": false})
+		}
+	})
+
+	router.POST("/api/delete/post/:ID", Auth(), func(c *gin.Context) {
+		session := sessions.Default(c)
+
+		clientEmail := session.Get("email")
+
+		requestedID := c.Param("ID")
+		filter := bson.M{
+			"postid": requestedID,
+		}
+		var post Post
+
+		postsCollection.FindOne(context.TODO(), filter).Decode(&post)
+
+		if post.AuthorEmail == clientEmail {
+			_, err := postsCollection.DeleteOne(context.TODO(), filter)
+			if err != nil {
+				log.Fatal(err)
+			}
+			c.Redirect(302, "/dashboard")
+		} else {
+			c.Redirect(302, "/dashboard")
+		}
+	})
+
+	router.GET("/api/post/:ID", Auth(), func(c *gin.Context) {
+		requestedID := c.Param("ID")
+		filter := bson.M{
+			"postid": requestedID,
+		}
+		var post Post
+		err := postsCollection.FindOne(context.TODO(), filter).Decode(&post)
+		if err != nil {
+			c.JSON(200, bson.M{"message": "No posts found"})
+		} else {
+			data, err := json.Marshal(post)
+			if err != nil {
+				log.Fatal(err)
+			}
+			c.String(200, string(data))
+		}
 	})
 
 	router.POST("/api/addpost", Auth(), func(c *gin.Context) {

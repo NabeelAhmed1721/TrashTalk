@@ -52,7 +52,7 @@
             _localData = JSON.parse(localData.responseText);
             }
         };
-        localData.open("GET", "/info", true);
+        localData.open("GET", "/api/info", true);
         localData.send();
 
         var postData = new XMLHttpRequest();
@@ -67,7 +67,7 @@
                 }
             }
         };
-        postData.open("GET", "/posts/", true);
+        postData.open("GET", "/api/posts/", true);
         postData.send();
 
         function modalHandler() {
@@ -77,7 +77,7 @@
         function createCard(id,title, desc, loc, date, author, imageLocation) {
 
             var link = document.createElement("a")
-            link.setAttribute("href", "/post/"+id)
+            link.setAttribute("href", "/post?id="+id)
             var card = document.createElement("div")
             card.setAttribute("class", "card")
             var cardImg = document.createElement("img")
