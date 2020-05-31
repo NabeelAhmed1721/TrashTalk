@@ -52,3 +52,10 @@
     margin-left: 20px;
     margin-top: 20px;
 }
+
+.posts {
+    position: absolute;
+    z-index: 100;
+    margin-top: 150px;
+    margin-left: 20px;
+}

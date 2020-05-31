@@ -1,7 +1,7 @@
 <html>
     <head>
         <title>TrashTalk</title>
-        <link rel="stylesheet" href="/static/css/profile.css">
+        <link rel="stylesheet" href="/static/css/profile.css?v=1">
     </head>
     <body>
         <div class="modal">
@@ -17,10 +17,17 @@
                     <div id="user_email" class="email">Nabeel Ahmed</div>
                 </div>
             </div>
+            <div class="posts">
+                <h1>My Posts</h1>
+                <ul id="postsData">
+                </ul>
+            </div>
         </div>
     </body>
     <script>
         var _localData = {}
+        var _postData = {}
+
         var localData = new XMLHttpRequest();
         localData.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
@@ -29,9 +36,39 @@
 
             document.getElementById("user_name").innerText = _localData.name
             document.getElementById("user_email").innerText = _localData.email
+
+            var postData = new XMLHttpRequest();
+        postData.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+            // Typical action to be performed when the document is ready:
+            _postData = JSON.parse(postData.responseText);
+
+            for(var x = 0; x < _postData.length; x++) {
+                makeItem(_postData[x].Title,_postData[x].PostID)
+            }
+            }
+        };
+        postData.open("GET", "/api/posts/"+_localData.email, true);
+        postData.send();
             }
         };
         localData.open("GET", "/api/info", true);
         localData.send();
+
+
+        function makeItem(title,postID) {
+            var list = document.createElement("li")
+            var link = document.createElement("a")
+            link.setAttribute("href", "/post?id="+postID)
+
+            listTitle = document.createTextNode(title)
+
+            link.appendChild(listTitle)
+
+            list.appendChild(link)
+
+
+            document.getElementById("postsData").appendChild(list)
+        }
     </script>
 </html>
