@@ -178,6 +178,25 @@ func main() {
 
 	})
 
+	router.GET("/posts/:email", Auth(), func(c *gin.Context) {
+		requestedEmail := c.Param("email")
+		var final []Post
+		items, err := postsCollection.Find(context.TODO(), bson.M{"authoremail": requestedEmail})
+		if err != nil {
+			log.Fatal(err)
+		}
+		for items.Next(context.TODO()) {
+			var post Post
+			items.Decode(&post)
+			final = append(final, post)
+		}
+		data, err := json.Marshal(final)
+		if err != nil {
+			log.Fatal(err)
+		}
+		c.String(200, string(data))
+	})
+
 	router.GET("/posts/", Auth(), func(c *gin.Context) {
 		var final []Post
 		items, err := postsCollection.Find(context.TODO(), bson.M{})
