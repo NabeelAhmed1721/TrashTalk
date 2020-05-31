@@ -3,7 +3,7 @@
         <title>
             Dashboard
         </title>
-        <link rel="stylesheet" href="/static/css/main.css?v=2">
+        <link rel="stylesheet" href="/static/css/main.css?v=1">
     </head>
     <body>
         <div id="addModal" class="modal">
@@ -28,33 +28,101 @@
                 </div>
             </a>
         </div>
-        <div class="main">
-            <div class="card">
+        <div id="cardContainer" class="main">
+            <!-- <div class="card">
                 <img src="/static/assets/post.jpg">
                 <div class="card-info">
                     <div class="card-title">Used USB</div>
                     <div class="card-desc">Issa poorly used usb. I mean what more can I say?</div>
-                    <div class="card-desc">Princeton - NJ</div>
+                    <div class="card-loc">Princeton - NJ</div>
+                    <div class="card-date">03/23/2020</div>
                     <div class="card-author">Edward Man</div>
                 </div>
-            </div>
+            </div> -->
         </div>
         <div onclick="modalHandler()" class="add">+</div>
     </body>
     <script>
         var _localData = {}
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
+        var _postData = {}
+        var localData = new XMLHttpRequest();
+        localData.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
             // Typical action to be performed when the document is ready:
-            _localData = JSON.parse(xhttp.responseText);
+            _localData = JSON.parse(localData.responseText);
             }
         };
-        xhttp.open("GET", "/info", true);
-        xhttp.send();
+        localData.open("GET", "/info", true);
+        localData.send();
+
+        var postData = new XMLHttpRequest();
+        postData.onreadystatechange = function() {
+            if (this.readyState == 4 && this.status == 200) {
+            // Typical action to be performed when the document is ready:
+            _postData = JSON.parse(postData.responseText);
+
+                for(var x = 0; x < _postData.length; x++){
+                    var p = _postData[x]
+                    createCard(p.PostID, p.Title,p.Desc,p.Location,p.Date, p.AuthorName,p.ImagePath)
+                }
+            }
+        };
+        postData.open("GET", "/posts/", true);
+        postData.send();
 
         function modalHandler() {
             document.getElementById("addModal").classList.toggle("modalShow")
+        }
+
+        function createCard(id,title, desc, loc, date, author, imageLocation) {
+
+            var link = document.createElement("a")
+            link.setAttribute("href", "/post/"+id)
+            var card = document.createElement("div")
+            card.setAttribute("class", "card")
+            var cardImg = document.createElement("img")
+            cardImg.setAttribute("src", "/static/posts/"+imageLocation)
+            var cardInfo = document.createElement("div")
+            cardInfo.setAttribute("class", "card-info")
+
+            var cardInfoTitle = document.createElement("div")
+            var cardInfoDesc = document.createElement("div")
+            var cardInfoLoc = document.createElement("div")
+            var cardInfoDate = document.createElement("div")
+            var cardInfoAuthor = document.createElement("div")
+
+            cardInfoTitle.setAttribute("class", "card-title")
+            cardInfoDesc.setAttribute("class", "card-desc")
+            cardInfoLoc.setAttribute("class","card-loc")
+            cardInfoDate.setAttribute("class","card-date")
+            cardInfoAuthor.setAttribute("class","card-author")
+
+
+            cardInfoTitleNode = document.createTextNode(title)
+            cardInfoDescNode = document.createTextNode(desc)
+            cardInfoLocNode = document.createTextNode(loc)
+            cardInfoDateNode = document.createTextNode(date)
+            cardInfoAuthorNode = document.createTextNode(author)
+
+            cardInfoTitle.appendChild(cardInfoTitleNode)
+            cardInfoDesc.appendChild(cardInfoDescNode)
+            cardInfoLoc.appendChild(cardInfoLocNode)
+            cardInfoDate.appendChild(cardInfoDateNode)
+            cardInfoAuthor.appendChild(cardInfoAuthorNode)
+
+
+            cardInfo.appendChild(cardInfoTitle)
+            cardInfo.appendChild(cardInfoDesc)
+            cardInfo.appendChild(cardInfoLoc)
+            cardInfo.appendChild(cardInfoDate)
+            cardInfo.appendChild(cardInfoAuthor)
+
+            card.appendChild(cardImg)
+            card.appendChild(cardInfo)
+
+            link.appendChild(card)
+
+            document.getElementById("cardContainer").appendChild(link)
         }
     </script>
 </html>

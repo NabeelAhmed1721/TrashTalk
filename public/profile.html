@@ -21,17 +21,17 @@
     </body>
     <script>
         var _localData = {}
-        var xhttp = new XMLHttpRequest();
-        xhttp.onreadystatechange = function() {
+        var localData = new XMLHttpRequest();
+        localData.onreadystatechange = function() {
             if (this.readyState == 4 && this.status == 200) {
             // Typical action to be performed when the document is ready:
-            _localData = JSON.parse(xhttp.responseText);
+            _localData = JSON.parse(localData.responseText);
 
             document.getElementById("user_name").innerText = _localData.name
             document.getElementById("user_email").innerText = _localData.email
             }
         };
-        xhttp.open("GET", "/info", true);
-        xhttp.send();
+        localData.open("GET", "/info", true);
+        localData.send();
     </script>
 </html>
