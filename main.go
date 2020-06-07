@@ -41,7 +41,7 @@ func emailExists(email string, collection *mongo.Collection) bool {
 
 func main() {
 	gin.SetMode(gin.ReleaseMode)
-	mgdClientOpt := options.Client().ApplyURI("mongodb+srv://na-admin:rV9byQPoKeQBJpka@trashtalkpuddle-qpofb.mongodb.net/")
+	mgdClientOpt := options.Client().ApplyURI("ENTER_MONGODB_URL")
 	mgdClient, err := mongo.Connect(context.TODO(), mgdClientOpt)
 
 	usersCollection := mgdClient.Database("trashtalk").Collection("users")
